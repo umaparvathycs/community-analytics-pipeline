@@ -3,11 +3,13 @@ import sqlite3
 import random
 import pandas as pd
 
-DB_PATH = os.path.join("data", "community_resource.db")
+# Absolute path configuration to eliminate terminal execution errors
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DB_PATH = os.path.join(BASE_DIR, "data", "community_resource.db")
 
 def get_connection():
     """Establishes and returns a connection to the SQLite database."""
-    os.makedirs("data", exist_ok=True)
+    os.makedirs(os.path.join(BASE_DIR, "data"), exist_ok=True)
     return sqlite3.connect(DB_PATH)
 
 def initialize_database():
@@ -22,9 +24,7 @@ def initialize_database():
     cursor.execute("PRAGMA foreign_keys = ON;")
     
     # 1. Create Community Segments Lookup Table
-    cursor.execute("""
-    DROP TABLE IF EXISTS community_segments;
-    """)
+    cursor.execute("DROP TABLE IF EXISTS community_segments;")
     cursor.execute("""
     CREATE TABLE community_segments (
         segment_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -34,9 +34,7 @@ def initialize_database():
     """)
     
     # 2. Create Households Dimension/Fact Table
-    cursor.execute("""
-    DROP TABLE IF EXISTS households;
-    """)
+    cursor.execute("DROP TABLE IF EXISTS households;")
     cursor.execute("""
     CREATE TABLE households (
         household_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -54,7 +52,7 @@ def initialize_database():
     conn.close()
     print("[INFO] Database schemas initialized successfully with strict constraints.")
 
-def seed_database(num_households=200, seed=42):
+def seed_database(num_households=250, seed=42):
     """
     Seeds the database with statistically distinct populations for 
     Rural and Urban segments, incorporating missingness and anomalies.
@@ -76,31 +74,26 @@ def seed_database(num_households=200, seed=42):
     households_data = []
     
     for _ in range(num_households):
-        # Pick a segment randomly to maintain an approximate 50/50 split
         segment = random.choice(["Urban", "Rural"])
         seg_id = segments[segment]
         
-        # Simulate divergent statistical profiles to give the T-Test real weight later
         if segment == "Urban":
             hh_size = random.randint(1, 5)
-            # Base distribution for Urban
             water = random.normalvariate(18.5, 4.0) 
             waste = random.normalvariate(45.0, 10.0)
             income = min(max(random.normalvariate(0.65, 0.15), 0.0), 1.0)
         else:
-            hh_size = random.randint(2, 8) # Rural households trend larger
-            # Base distribution for Rural
+            hh_size = random.randint(2, 8)
             water = random.normalvariate(12.0, 3.5)
             waste = random.normalvariate(28.0, 8.5)
             income = min(max(random.normalvariate(0.40, 0.12), 0.0), 1.0)
             
-        # Introduce Engineered Anomaly: Outliers (High-Volume Outliers)
-        if random.random() < 0.04:  # 4% chance of extreme outlier
+        # Introduce High-Volume Outliers (4%)
+        if random.random() < 0.04:
             water *= 3.0
             waste *= 2.5
             
-        # Introduce Engineered Anomaly: Induce MCAR (Missing Completely At Random) Values
-        # This gives Stage 2's Median Imputation Pipeline actual work to do.
+        # Introduce Missing Completely At Random (MCAR) Values
         water_val = None if random.random() < 0.08 else round(water, 2)
         waste_val = None if random.random() < 0.10 else round(waste, 2)
         
@@ -116,10 +109,7 @@ def seed_database(num_households=200, seed=42):
     print(f"[INFO] Successfully seeded database with {num_households} household records.")
 
 def fetch_raw_pipeline_data():
-    """
-    Executes a clean relational inner join query to extract raw data 
-    for processing in the downstream analytics layer.
-    """
+    """Executes a clean relational inner join query to extract raw data."""
     conn = get_connection()
     query = """
         SELECT 
@@ -137,8 +127,5 @@ def fetch_raw_pipeline_data():
     return df
 
 if __name__ == "__main__":
-    # Self-contained testing block to verify code execution standalone
     initialize_database()
-    seed_database(num_households=250)
-    df_check = fetch_raw_pipeline_data()
-    print(f"[SUCCESS] Extracted Data Matrix Shape: {df_check.shape}")
+    seed_database()
