@@ -1,5 +1,5 @@
 # Localized Regional Resource & Community Metrics Pipeline
-
+### 🌐 Live Web Application: [Click Here to View Live Dashboard](https://community-analytics-pipeline.streamlit.app/)
 ## 🎯 Project Topic: Household Resource Consumption & Waste Generation Dynamics
 This project models and analyzes regional socio-economic and utility footprints, specifically targeting **Household Water Consumption ($m^3$)** and **Monthly Waste Generation ($kg$)** across distinct, heterogeneous community segments (**Rural** vs. **Urban**). 
 
