@@ -1,6 +1,11 @@
 # Localized Regional Resource & Community Metrics Pipeline
 
-An enterprise-grade, end-to-end data engineering and analytics pipeline that extracts, processes, validates, and models localized community metrics. The system architecture processes structured household survey data split across distinct **Rural** and **Urban** segments, treating the journey from relational persistence to interactive frontend deployment as a unified, production-ready ecosystem.
+## 🎯 Project Topic: Household Resource Consumption & Waste Generation Dynamics
+This project models and analyzes regional socio-economic and utility footprints, specifically targeting **Household Water Consumption ($m^3$)** and **Monthly Waste Generation ($kg$)** across distinct, heterogeneous community segments (**Rural** vs. **Urban**). 
+
+The goal of this pipeline is to provide municipal planning committees and data-driven policy researchers with an automated framework to ingest raw survey data, mathematically validate consumption variances, discover behavioral household profiles (personas), and interactively audit localized resource grids.
+
+---
 
 ## 🏗️ Architectural Topology
 The framework is engineered into a clean, 4-stage decoupled architecture:
