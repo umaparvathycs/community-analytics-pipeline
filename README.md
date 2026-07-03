@@ -45,3 +45,75 @@ Instead of shipping a static CSV, the project generates its own data to mimic re
 ---
 
 ## Repository Structure
+community-analytics-pipeline/
+├── src/
+│   ├── database_engine.py   # Schema + data generator
+│   ├── analytics_core.py    # Cleaning, imputation, t-test
+│   ├── ml_pipeline.py       # Scaling + K-Means
+│   └── app.py               # Streamlit dashboard
+├── data/                    # Created automatically on first run (gitignored)
+├── requirements.txt
+└── README.md
+
+
+> **Note:** The `data/` folder isn't in the GitHub repo. It's generated locally when you run the app or seed script. The `.db` file is excluded via `.gitignore` to keep the repo lightweight and avoid committing binary files.
+
+---
+
+## Key Insights from the Pipeline
+
+With the default seeded data, here's what you'll see:
+
+### Statistical Validation (Welch's t-test)
+- The test consistently returns **p < 0.05**, meaning urban vs. rural consumption differences are real, not random.
+- This matters because it confirms that the ML model is clustering *actual* behavioral patterns, not noise.
+
+### Household Personas (K-Means, K=3)
+The algorithm finds three distinct groups:
+
+- **Persona 0 – Low-usage / Eco-conscious** – Mostly rural, low water and waste.  
+- **Persona 1 – High-volume outliers** – The 4% anomaly group. Extreme consumption that warrants priority audits.  
+- **Persona 2 – Standard urban baseline** – Mid-to-high income, dense-area households with predictable usage.
+
+---
+
+## Engineering Choices Worth Mentioning
+
+- **Modular design** – `app.py` only handles presentation. All logic lives in separate, testable modules.
+- **Defensive schema** – The database resets cleanly on each seed, with proper foreign key constraints (`ON DELETE RESTRICT ON UPDATE CASCADE`).
+- **Cached performance** – Streamlit's `@st.cache_data` prevents the app from re-running expensive queries on every UI interaction.
+
+---
+
+## If This Were Scaled to Production
+
+- Replace SQLite with **BigQuery** or **Snowflake** for massive datasets.  
+- Orchestrate with **Airflow** or **Prefect** to schedule daily updates.  
+- Containerize with **Docker** and deploy on **Kubernetes** for auto-scaling.
+
+---
+
+## Tech Stack
+
+- Python 3.9+  
+- SQLite3  
+- Pandas, NumPy  
+- SciPy (t-test)  
+- Scikit-learn (StandardScaler, K-Means)  
+- Streamlit (dashboard)
+
+---
+
+## Getting Started
+
+```bash
+# Clone the repo
+git clone https://github.com/yourusername/community-analytics-pipeline.git
+cd community-analytics-pipeline
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the dashboard
+streamlit run src/app.py
+```
