@@ -45,6 +45,7 @@ Instead of shipping a static CSV, the project generates its own data to mimic re
 ---
 
 ## Repository Structure
+```text
 community-analytics-pipeline/
 ├── src/
 │   ├── database_engine.py   # Schema + data generator
@@ -54,7 +55,7 @@ community-analytics-pipeline/
 ├── data/                    # Created automatically on first run (gitignored)
 ├── requirements.txt
 └── README.md
-
+```
 
 > **Note:** The `data/` folder isn't in the GitHub repo. It's generated locally when you run the app or seed script. The `.db` file is excluded via `.gitignore` to keep the repo lightweight and avoid committing binary files.
 
